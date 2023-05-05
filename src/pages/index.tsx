@@ -5,7 +5,7 @@ import styles from '@/styles/Home.module.css'
 import {
     Accordion,
     AccordionDetails,
-    AccordionSummary, AppBar, Box, Button, Checkbox,
+    AccordionSummary, AppBar, Box, Button, Checkbox, CircularProgress,
     Container, Divider, FormControl, FormControlLabel, FormGroup,
     FormLabel,
     Grid, InputLabel, MenuItem, Paper, Select,
@@ -33,7 +33,9 @@ export default function Home() {
         fortyEight: false,
         sixtyFour: false,
         ninetySix: false
-    })
+    });
+
+    const [loadingLocations, setLoadingLocations] = useState<boolean>(false);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRam({
@@ -66,95 +68,156 @@ export default function Home() {
             </AppBar>
             <Container component="main" sx={{mb: 4}}>
                 <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
-                    <div>
-                        <Typography>Search Form</Typography>
-                        <Divider sx={{ mt: 2, mb: 2 }} />
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                <FormGroup>
-                                    <FormLabel component="legend">
-                                        Select disk space size (GB):
-                                    </FormLabel>
-                                    <Slider
-                                        getAriaValueText={valueText}
-                                        defaultValue={0}
-                                        aria-label="Default"
-                                        valueLabelDisplay="auto"
-                                        min={0}
-                                        name={'storage'}
-                                        max={72000}
-                                    />
-                                </FormGroup>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl sx={{ml: 3}} component="fieldset" variant="standard" fullWidth>
-                                    <FormLabel component="legend">RAM Memory:</FormLabel>
+                    {loadingLocations && (
+                        <Box textAlign="center">
+                            <CircularProgress />
+                        </Box>
+                    )}
+                    {!loadingLocations && (
+                        <div>
+                            <Typography>Search Form</Typography>
+                            <Divider sx={{ mt: 2, mb: 2 }} />
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
                                     <FormGroup>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox checked={ram.two} onChange={handleChange} name="two"/>
-                                            }
-                                            label="2GB"
-                                        />
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox checked={ram.four} onChange={handleChange}
-                                                          name="four"/>
-                                            }
-                                            label="4GB"
-                                        />
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox checked={ram.eight} onChange={handleChange}
-                                                          name="eight"/>
-                                            }
-                                            label="8GB"
+                                        <FormLabel component="legend">
+                                            Select disk space size (GB):
+                                        </FormLabel>
+                                        <Slider
+                                            getAriaValueText={valueText}
+                                            defaultValue={0}
+                                            aria-label="Default"
+                                            valueLabelDisplay="auto"
+                                            min={0}
+                                            name={'storage'}
+                                            max={72000}
                                         />
                                     </FormGroup>
-                                </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Box sx={{display: 'flex'}}>
+                                        <FormControl sx={{ml: 3}} component="fieldset" variant="standard" fullWidth>
+                                            <FormLabel component="legend">RAM Memory:</FormLabel>
+                                            <FormGroup>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.two} onChange={handleChange} name="two"/>
+                                                    }
+                                                    label="2GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.four} onChange={handleChange}
+                                                                  name="four"/>
+                                                    }
+                                                    label="4GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.eight} onChange={handleChange}
+                                                                  name="eight"/>
+                                                    }
+                                                    label="8GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.twelve} onChange={handleChange}
+                                                                  name="twelve"/>
+                                                    }
+                                                    label="12GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.sixteen} onChange={handleChange}
+                                                                  name="sixteen"/>
+                                                    }
+                                                    label="16GB"
+                                                />
+                                            </FormGroup>
+                                        </FormControl>
+                                        <FormControl component="fieldset" variant="standard" fullWidth>
+                                            <FormGroup>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.twentyFour} onChange={handleChange} name="twentyFour"/>
+                                                    }
+                                                    label="24GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.thirtyTwo} onChange={handleChange}
+                                                                  name="thirtyTwo"/>
+                                                    }
+                                                    label="32GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.fortyEight} onChange={handleChange}
+                                                                  name="fortyEight"/>
+                                                    }
+                                                    label="48GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.sixtyFour} onChange={handleChange}
+                                                                  name="sixtyFour"/>
+                                                    }
+                                                    label="64GB"
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox checked={ram.ninetySix} onChange={handleChange}
+                                                                  name="ninetySix"/>
+                                                    }
+                                                    label="96GB"
+                                                />
+                                            </FormGroup>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">HardDisk Type</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={'SAS'}
+                                            label="HardDisk Type"
+                                            name={'hard_disk_type'}
+                                            // onChange={handleChange}
+                                        >
+                                            <MenuItem value={'SAS'}>SAS</MenuItem>
+                                            <MenuItem value={'SATA'}>SATA</MenuItem>
+                                            <MenuItem value={'SSD'}>SSD</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Server Location</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={'SAS'}
+                                            label="HardDisk Type"
+                                            name={'location'}
+                                            // onChange={handleChange}
+                                        >
+                                            <MenuItem value={'SAS'}>SAS</MenuItem>
+                                            <MenuItem value={'SATA'}>SATA</MenuItem>
+                                            <MenuItem value={'SSD'}>SSD</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item alignItems={'end'}>
+                                    <Button type="submit" variant="contained">Search</Button>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={6}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">HardDisk Type</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={'SAS'}
-                                        label="HardDisk Type"
-                                        name={'hard_disk_type'}
-                                        // onChange={handleChange}
-                                    >
-                                        <MenuItem value={'SAS'}>SAS</MenuItem>
-                                        <MenuItem value={'SATA'}>SATA</MenuItem>
-                                        <MenuItem value={'SSD'}>SSD</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">Server Location</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={'SAS'}
-                                        label="HardDisk Type"
-                                        name={'location'}
-                                        // onChange={handleChange}
-                                    >
-                                        <MenuItem value={'SAS'}>SAS</MenuItem>
-                                        <MenuItem value={'SATA'}>SATA</MenuItem>
-                                        <MenuItem value={'SSD'}>SSD</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Button type="submit" variant="contained">Search</Button>
-                            </Grid>
-                        </Grid>
-                    </div>
+                        </div>
+                    )}
                     <Divider sx={{ mt: 3, mb: 3 }} />
                     <Box>
-                        Results...
+                        Use the form above to start your search...
                     </Box>
                 </Paper>
             </Container>
