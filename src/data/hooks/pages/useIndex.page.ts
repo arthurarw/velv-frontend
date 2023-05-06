@@ -5,7 +5,7 @@ export default function useIndexPage(){
     const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
     const [isLoadingServers, setIsLoadingServers] = useState<boolean>(false);
     const [servers, setServers] = useState([]);
-    const [locations, setLocations] = useState<[]>([]);
+    const [locations, setLocations] = useState<string[]>([]);
 
     async function onSubmit() {
         setIsLoadingServers(true);
@@ -27,9 +27,8 @@ export default function useIndexPage(){
             .get('/servers/locations')
             .then((response) => {
                 const { data } = response.data;
-                const result = Object.keys(data).map((key) => [data[key]]);
                 setIsLoadingLocations(false)
-                setLocations(result);
+                setLocations(data);
             }).catch((error) => {
                 setIsLoadingLocations(false);
                 setLocations([]);
