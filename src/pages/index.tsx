@@ -1,11 +1,6 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import {Inter} from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary, AppBar, Box, Button, Checkbox, CircularProgress,
+    AppBar, Box, Button, Checkbox, CircularProgress,
     Container, Divider, FormControl, FormControlLabel, FormGroup,
     FormLabel,
     Grid, InputLabel, MenuItem, Paper, Select,
@@ -13,8 +8,9 @@ import {
     Typography
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {main} from "@popperjs/core";
+import useIndexPage from "@/data/hooks/pages/useIndex.page";
 
 function valueText(value: number) {
     console.log(value);
@@ -22,6 +18,15 @@ function valueText(value: number) {
 }
 
 export default function Home() {
+    const {
+        isLoadingLocations,
+        isLoadingServers,
+        servers,
+        locations,
+        getLocations,
+        onSubmit
+    } = useIndexPage();
+
     const [ram, setRam] = useState({
         two: false,
         four: false,
@@ -44,6 +49,11 @@ export default function Home() {
         });
     };
 
+    useEffect(() => {
+        getLocations();
+    }, []);
+
+    console.log(locations);
     return (
         <>
             <Head>
@@ -68,15 +78,15 @@ export default function Home() {
             </AppBar>
             <Container component="main" sx={{mb: 4}}>
                 <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
-                    {loadingLocations && (
+                    {isLoadingLocations && (
                         <Box textAlign="center">
-                            <CircularProgress />
+                            <CircularProgress/>
                         </Box>
                     )}
-                    {!loadingLocations && (
+                    {!isLoadingLocations && (
                         <div>
                             <Typography>Search Form</Typography>
-                            <Divider sx={{ mt: 2, mb: 2 }} />
+                            <Divider sx={{mt: 2, mb: 2}}/>
                             <Grid container spacing={2}>
                                 <Grid item xs={6}>
                                     <FormGroup>
@@ -139,7 +149,8 @@ export default function Home() {
                                             <FormGroup>
                                                 <FormControlLabel
                                                     control={
-                                                        <Checkbox checked={ram.twentyFour} onChange={handleChange} name="twentyFour"/>
+                                                        <Checkbox checked={ram.twentyFour} onChange={handleChange}
+                                                                  name="twentyFour"/>
                                                     }
                                                     label="24GB"
                                                 />
@@ -198,24 +209,25 @@ export default function Home() {
                                         <Select
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
-                                            value={'SAS'}
-                                            label="HardDisk Type"
+                                            label="Server Location"
                                             name={'location'}
                                             // onChange={handleChange}
                                         >
-                                            <MenuItem value={'SAS'}>SAS</MenuItem>
-                                            <MenuItem value={'SATA'}>SATA</MenuItem>
-                                            <MenuItem value={'SSD'}>SSD</MenuItem>
+                                            {locations?.map((value, key) => {
+                                                return (
+                                                    <MenuItem key={key} value={value}>{value}</MenuItem>
+                                                );
+                                            })}
                                         </Select>
                                     </FormControl>
                                 </Grid>
                                 <Grid item alignItems={'end'}>
-                                    <Button type="submit" variant="contained">Search</Button>
+                                    <Button type="submit" variant="contained" onSubmit={onSubmit}>Search</Button>
                                 </Grid>
                             </Grid>
                         </div>
                     )}
-                    <Divider sx={{ mt: 3, mb: 3 }} />
+                    <Divider sx={{mt: 3, mb: 3}}/>
                     <Box>
                         Use the form above to start your search...
                     </Box>
