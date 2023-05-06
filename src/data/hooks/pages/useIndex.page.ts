@@ -5,7 +5,7 @@ export default function useIndexPage(){
     const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
     const [isLoadingServers, setIsLoadingServers] = useState<boolean>(false);
     const [servers, setServers] = useState([]);
-    const [locations, setLocations] = useState([]);
+    const [locations, setLocations] = useState<[]>([]);
 
     async function onSubmit() {
         setIsLoadingServers(true);

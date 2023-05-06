@@ -211,7 +211,7 @@ export default function Home() {
                                             id="demo-simple-select"
                                             label="Server Location"
                                             name={'location'}
-                                            // onChange={handleChange}
+                                            disabled={isLoadingLocations}
                                         >
                                             {locations?.map((value, key) => {
                                                 return (
@@ -222,7 +222,8 @@ export default function Home() {
                                     </FormControl>
                                 </Grid>
                                 <Grid item alignItems={'end'}>
-                                    <Button type="submit" variant="contained" onSubmit={onSubmit}>Search</Button>
+                                    <Button type="submit" variant="contained" onSubmit={onSubmit}
+                                            disabled={isLoadingLocations}>Search</Button>
                                 </Grid>
                             </Grid>
                         </div>
