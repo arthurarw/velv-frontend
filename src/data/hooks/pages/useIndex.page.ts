@@ -6,7 +6,9 @@ import {IServerResponse} from "@/data/interfaces/IResponse";
 export default function useIndexPage(){
     const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
     const [isLoadingServers, setIsLoadingServers] = useState<boolean>(false);
-    const [servers, setServers] = useState<IServerResponse>();
+    const [servers, setServers] = useState<IServerResponse>({
+        data: []
+    });
     const [locations, setLocations] = useState<string[]>([]);
 
     async function onSubmit(data: ISearchForm) {
@@ -31,7 +33,7 @@ export default function useIndexPage(){
                 setServers(response.data);
             }).catch((error) => {
                 setIsLoadingServers(false);
-                setServers();
+                setServers({ data: [] });
             });
     }
 

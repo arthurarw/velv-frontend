@@ -12,97 +12,19 @@ import {
     FormGroup,
     FormLabel,
     Grid,
-    IconButton,
     InputLabel,
     MenuItem,
     Paper,
     Select,
     Slider,
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TablePagination,
-    TableRow,
     Toolbar,
     Typography
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import useIndexPage from "@/data/hooks/pages/useIndex.page";
-import {Controller, useForm} from "react-hook-form";
-import {useTheme} from "@mui/system";
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
-
-
-interface TablePaginationActionsProps {
-    count: number;
-    page: number;
-    rowsPerPage: number;
-    onPageChange: (
-        event: React.MouseEvent<HTMLButtonElement>,
-        newPage: number,
-    ) => void;
-}
-
-function TablePaginationActions(props: TablePaginationActionsProps) {
-    const theme = useTheme();
-    const { count, page, rowsPerPage, onPageChange } = props;
-
-    const handleFirstPageButtonClick = (
-        event: React.MouseEvent<HTMLButtonElement>,
-    ) => {
-        onPageChange(event, 1);
-    };
-
-    const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, page - 1);
-    };
-
-    const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, page + 1);
-    };
-
-    const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-    };
-
-    return (
-        <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-            <IconButton
-                onClick={handleFirstPageButtonClick}
-                disabled={page === 1}
-                aria-label="first page"
-            >
-                {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-            </IconButton>
-            <IconButton
-                onClick={handleBackButtonClick}
-                disabled={page === 1}
-                aria-label="previous page"
-            >
-                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-            </IconButton>
-            <IconButton
-                onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="next page"
-            >
-                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-            </IconButton>
-            <IconButton
-                onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="last page"
-            >
-                {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-            </IconButton>
-        </Box>
-    );
-}
+import {Controller, SubmitHandler, useForm} from "react-hook-form";
+import {ISearchForm} from "@/data/interfaces/ISearchForm";
+import {ServersList} from "@/ui/components/ServersList";
 
 export default function Home() {
     const {
@@ -117,16 +39,12 @@ export default function Home() {
     const [page, setPage] = useState<number>(1);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-    const { register,
+    const {
         handleSubmit,
+        register,
         control,
         getValues
     } = useForm();
-
-    const locationForm = getValues('location');
-    const ramForm = getValues('ram');
-    const hardDiskTypeForm = getValues('hark_disk_type');
-    const storageForm = getValues('storage');
 
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,
@@ -142,35 +60,28 @@ export default function Home() {
         setPage(1);
     };
 
+    const onSubmitForm: SubmitHandler<ISearchForm> = data => {
+        const newData = {
+            ...data,
+            page: page,
+            per_page: rowsPerPage
+        }
+
+        onSubmit(newData);
+    }
+
     useEffect(() => {
         getLocations();
     }, []);
 
     useEffect(() => {
-        console.log(locationForm,
-        ramForm,
-        hardDiskTypeForm,
-        storageForm);
-
-        onSubmit({
-            page: page,
-            per_page: rowsPerPage,
-            location: locationForm,
-            ram: ramForm,
-            hard_disk_type: hardDiskTypeForm,
-            storage: storageForm
-        });
+        const values = getValues();
+        onSubmitForm({...values, page: page, per_page: rowsPerPage});
     }, [page]);
 
     useEffect(() => {
-        onSubmit({
-            page: 1,
-            per_page: rowsPerPage,
-            location: locationForm,
-            ram: ramForm,
-            hard_disk_type: hardDiskTypeForm,
-            storage: storageForm
-        });
+        const values = getValues();
+        onSubmitForm({...values, page: 1, per_page: rowsPerPage});
     }, [rowsPerPage]);
 
     return (
@@ -203,7 +114,7 @@ export default function Home() {
                         </Box>
                     )}
                     {!isLoadingLocations && (
-                        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+                        <Box component="form" onSubmit={handleSubmit(onSubmitForm)}>
                             <Typography>Search Form</Typography>
                             <Divider sx={{mt: 2, mb: 2}}/>
                             <Grid container spacing={2}>
@@ -357,59 +268,22 @@ export default function Home() {
                     )}
                     <Divider sx={{mt: 3, mb: 3}}/>
                     <Box>
-                        Use the form above to start your search...
                         {isLoadingServers && (
                             <Box textAlign="center">
                                 <CircularProgress/>
                             </Box>
                         )}
+                        {!isLoadingServers && servers?.data?.length === 0 && (
+                            <Typography mt={5}>
+                                Servers not found! Use the form above to start your search.
+                            </Typography>
+                        )}
                         {!isLoadingServers && servers?.data?.length > 0 && (
-                            <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Model</TableCell>
-                                        <TableCell>RAM</TableCell>
-                                        <TableCell>HDD</TableCell>
-                                        <TableCell>Location</TableCell>
-                                        <TableCell>Price</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {servers?.data?.map((server) => (
-                                        <TableRow key={server.id}>
-                                            <TableCell component="th" scope="row">
-                                                {server.model}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                {server.original_ram}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                {server.storage}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                {server.location}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                {server.price}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TablePagination
-                                            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                                            colSpan={3}
-                                            count={servers?.total ?? 0}
-                                            rowsPerPage={servers?.per_page ?? 10}
-                                            page={servers?.current_page ?? 1}
-                                            onPageChange={handleChangePage}
-                                            onRowsPerPageChange={handleChangeRowsPerPage}
-                                            ActionsComponent={TablePaginationActions}
-                                        />
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
+                            <ServersList
+                                servers={servers}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
                         )}
                     </Box>
                 </Paper>
