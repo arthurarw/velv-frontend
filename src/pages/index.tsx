@@ -1,30 +1,11 @@
 import Head from 'next/head'
-import {
-    AppBar,
-    Box,
-    Button,
-    Checkbox,
-    CircularProgress,
-    Container,
-    Divider,
-    FormControl,
-    FormControlLabel,
-    FormGroup,
-    FormLabel,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Slider,
-    Toolbar,
-    Typography
-} from "@mui/material";
+import {AppBar, Box, CircularProgress, Container, Divider, Paper, Toolbar, Typography} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import useIndexPage from "@/data/hooks/pages/useIndex.page";
-import {Controller, SubmitHandler, useForm} from "react-hook-form";
+import {SubmitHandler, useForm} from "react-hook-form";
 import {ISearchForm} from "@/data/interfaces/ISearchForm";
 import {ServersList} from "@/ui/components/ServersList";
+import {SearchForm} from "@/ui/components/SearchForm";
 
 export default function Home() {
     const {
@@ -38,11 +19,9 @@ export default function Home() {
 
     const [page, setPage] = useState<number>(1);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+    const [filter, setFilter] = useState<ISearchForm | null>();
 
     const {
-        handleSubmit,
-        register,
-        control,
         getValues
     } = useForm();
 
@@ -61,6 +40,7 @@ export default function Home() {
     };
 
     const onSubmitForm: SubmitHandler<ISearchForm> = data => {
+        setFilter(data);
         const newData = {
             ...data,
             page: page,
@@ -75,13 +55,11 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        const values = getValues();
-        onSubmitForm({...values, page: page, per_page: rowsPerPage});
+        onSubmitForm({ ...filter, page: page, per_page: rowsPerPage });
     }, [page]);
 
     useEffect(() => {
-        const values = getValues();
-        onSubmitForm({...values, page: 1, per_page: rowsPerPage});
+        onSubmitForm({ ...filter, page: 1, per_page: rowsPerPage });
     }, [rowsPerPage]);
 
     return (
@@ -114,157 +92,12 @@ export default function Home() {
                         </Box>
                     )}
                     {!isLoadingLocations && (
-                        <Box component="form" onSubmit={handleSubmit(onSubmitForm)}>
-                            <Typography>Search Form</Typography>
-                            <Divider sx={{mt: 2, mb: 2}}/>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} xl={6}>
-                                    <FormGroup>
-                                        <FormLabel component="legend">
-                                            Select disk space size (GB):
-                                        </FormLabel>
-                                        <Controller
-                                            defaultValue={0}
-                                            control={control}
-                                            render={(props) => (
-                                                <Slider
-                                                    {...props}
-                                                    min={0}
-                                                    max={72000}
-                                                    valueLabelDisplay="auto"
-                                                    value={props.field.value}
-                                                    onChange={props.field.onChange}
-                                                />
-                                            )}
-                                            name={'storage'}
-                                        />
-
-                                    </FormGroup>
-                                </Grid>
-                                <Grid item xs={12} xl={6}>
-                                    <Box sx={{display: 'flex'}}>
-                                        <FormControl sx={{ml: 3}} component="fieldset" variant="standard" fullWidth>
-                                            <FormLabel component="legend">RAM Memory:</FormLabel>
-                                            <FormGroup>
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="2GB"
-                                                    label="2GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="4GB"
-                                                    label="4GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="8GB"
-                                                    label="8GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="12GB"
-                                                    label="12GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="16GB"
-                                                    label="16GB"
-                                                />
-                                            </FormGroup>
-                                        </FormControl>
-                                        <FormControl component="fieldset" variant="standard" fullWidth>
-                                            <FormGroup>
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="24GB"
-                                                    label="24GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="32GB"
-                                                    label="32GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="48GB"
-                                                    label="48GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="64GB"
-                                                    label="64GB"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Checkbox {...register('ram')} />
-                                                    }
-                                                    value="96GB"
-                                                    label="96GB"
-                                                />
-                                            </FormGroup>
-                                        </FormControl>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={12} xl={6}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label">HardDisk Type</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            // value={''}
-                                            label="HardDisk Type"
-                                            {...register('hard_disk_type')}
-                                        >
-                                            <MenuItem value={'SAS'}>SAS</MenuItem>
-                                            <MenuItem value={'SATA'}>SATA</MenuItem>
-                                            <MenuItem value={'SSD'}>SSD</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} xl={6}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label">Server Location</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            label="Server Location"
-                                            {...register('location')}
-                                            disabled={isLoadingLocations}
-                                        >
-                                            {locations?.map((value, key) => {
-                                                return (
-                                                    <MenuItem key={key} value={value}>{value}</MenuItem>
-                                                );
-                                            })}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item alignItems={'end'}>
-                                    <Button type="submit" variant="contained" disabled={isLoadingLocations}>
-                                        Search
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Box>
+                        <SearchForm
+                            onSubmitForm={onSubmitForm}
+                            locations={locations}
+                            isLoadingLocations={isLoadingLocations}
+                            // values={valuesFromForm}
+                        />
                     )}
                     <Divider sx={{mt: 3, mb: 3}}/>
                     <Box>
