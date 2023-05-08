@@ -8,8 +8,16 @@ First, clone the repository:
 git clone https://github.com/arthurarw/velv-frontend.git
 ```
 
-Create the .env file
+Inside your project, run this command:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
 
+Create the .env file
 ```sh
 cp .env.example .env
 ```
